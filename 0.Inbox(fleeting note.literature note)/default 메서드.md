@@ -1,6 +1,6 @@
 # 날짜 : 2022-09-14 08:01
 
-# 주제 : #java8 
+# 주제 : #java8 #인터페이스
 ----
 # 메모
 ```ad-note
@@ -38,10 +38,10 @@ title: tl;dr
 ### 인터페이스를 상속받는 인터페이스에서 다시 추상메소드로 변경할 수 있다.
 
 
-![](Pasted%20image%2020220916074415.png)
+![](../img/Pasted%20image%2020220916074415.png)
 - 인터페이스 Foo와 Bar 모두 같은 default 메서드를 가지고 있는 경우 구현체인 DefaultFoo는 어떤 것을 써야할 지 모르기 때문에 컴파일 에러가 난다.
 - 이렇게 충돌하는 경우에는 직접 오버라이딩을 해야한다.
-	![](Pasted%20image%2020220916074955.png)
+	![](../img/Pasted%20image%2020220916074955.png)
 	```java
 	package me.whiteship.java8to11;  
 	  
