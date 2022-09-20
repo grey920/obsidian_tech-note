@@ -87,7 +87,6 @@ title: 컬렉션과 스트림 비교
         .skip( 10 )  
         .limit( 10 )  
         .forEach( System.out::println );  
-;
 	```
 
 ### 제한하기
