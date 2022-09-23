@@ -42,7 +42,7 @@ title: tl;dr
 3. **(자바 8부터) Optional을 리턴한다.** 클라이언트 코드에게 명시적으로 빈 값일수도 있다는 걸 알려주고, 빈 값인 경우에 대한 처리를 강제한다.
 
 
-## Optional 사용하기
+## Optional로 객체 감싸기 ( of와 ofNullable )
 ### 1. Optional.ofNullable(  ) -> null일 수 있는 객체를 감싸는 경우 
 ```java
 public Optional<Progress> getProgress () {  
@@ -86,10 +86,78 @@ public void setProgress ( Optional<Progress> progress ) {
 
 
 ### 2. Optional을 리턴하는 메소드에서 null을 리턴하지 말자
+- 리턴하는 메소드에서 이렇게 null을 리턴하는 경우,
+	```java
+	public Optional<Progress> getProgress () {  
+	    return null;  
+	    //return Optional.ofNullable( progress ); 
+	}
+	```
+	클라이언트쪽에서 Optional이 제공하는 메소드인 ifPresent()를 써봤자 null을 리턴받기 때문에 NPE가 발생한다
+	![](Pasted%20image%2020220922070302.png|450)
+- 따라서 없다는 것을 표현하려면 리턴하는 메소드에서 Optional.empty()을 리턴하자
+	```java
+	public Optional<Progress> getProgress () {  
+	    return Optional.empty();  
+	}
+	```
 
 ### 3. primitive타입은 primitive용 Optional을 따로 쓰자
+- 사용하지 않으면 내부적으로 박싱/언박싱이 빈번하게 일어나므로 성능상 좋지 않다.
+	```java
+	/* primitive 타입을 그냥 넣으면 내부적으로 Boxing/Unboxing 이 일어나서 성능에 안좋다. */  
+	Optional.of(10);  
+	OptionalInt.of( 10 );
+	```
 
 ### 4. Collection, Map, Stream Array, Optional은 Optional로 감싸지 말 것.
+- 이미 그 자체로 비어있는지 판단할 수 있는 컨테이너들을 Optional로 감싸는 것은 **Optional을 두 번 감싸는 것과 같다.**
+
+
+## Optional API 사용하기
+
+### 준비
+```java
+List<OnlineClass> springClasses = new ArrayList<>();  
+springClasses.add(new OnlineClass(1, "spring boot", true));   
+springClasses.add(new OnlineClass(5, "rest api development", false));
+```
+
+### Optional 만들기
+
+
+### Optional에 값이 있는지 없는지 확인하기
+
+
+### Optional에 있는 값 가져오기
+
+
+### Optional에 값이 있는 경우에 그 값을 가지고 xxx를 하라.
+
+
+### Optional에 값이 있으면 가져오고 없으면 xxx를 리턴하라
+
+
+### Optional에 값이 있으면 가져오고 없으면 xxx를 하라
+
+
+### Optional에 값이 있으면 가져오고 없으면 에러를 던져라
+
+
+### Optional에 들어있는 값 걸러내기
+
+
+### Optional에 들어있는 값 변환하기
+
+
+
+
+
+
+
+
+
+
 
 
 
