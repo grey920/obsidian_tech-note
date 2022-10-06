@@ -9,13 +9,11 @@
 
 ```ad-note
 title: tl;dr
-- 
+- 서브태스크를 스레드 풀( [ForkJoinPool](ForkJoinPool.md) )의 작업자 스레드에 분산 할당하는 인터페이스
 ```
 
-## ExecutorService Interface
 
 
-## 
 
 
 

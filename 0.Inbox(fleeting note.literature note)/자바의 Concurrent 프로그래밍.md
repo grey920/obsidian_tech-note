@@ -214,7 +214,10 @@ public class MultiThreadApp {
 - thread.join()을 걸면 메인 쓰레드가 thread의 3초를 기다렸다가 다음 라인인 `Thread[Thread-0,5,] is finished`를 출력하고 종료된다.
 - 하지만 thread.join()을 주석하면 `Thread[Thread-0,5,] is finished`가 바로 출력되고 계속 돌다가 종료된다.
 - 대기하는 도중에 누군가 main 쓰레드를 interrupt하면 역시 InterruptedException이 일어난다
-**=> 복잡하다!!! (문제임) => 개발자가 직접 쓰레드를 코딩으로 관리하면 안되기 때문에 [[Executors]]가 생김 => Executor를 사용하면 Future를 사용할 수 있게된다.**
+**=> 복잡하다!!! (문제임) => 개발자가 직접 쓰레드를 코딩으로 관리하면 안되기 때문에 [[Executors]]가 생김 => Executor를 사용하면 Future를 사용할 수 있게된다.** ^b782e7
+
+
+## 자바8의 CompletableFuture
 
 
 
@@ -224,4 +227,4 @@ public class MultiThreadApp {
 
 # 연결문서
 -  [Executors](Executors.md)
-- 
+- [CompletableFuture](CompletableFuture.md)
