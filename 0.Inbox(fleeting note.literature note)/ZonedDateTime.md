@@ -31,4 +31,4 @@ title: tl;dr
 - [ZonedDateTime 사용법](https://www.daleseo.com/java8-zoned-date-time/)
 
 # 연결문서
-- [자바8의 Date와 Time API](자바8의%20Date와%20Time%20API.md)
+- [자바 8의 Date와 Time API](자바%208의%20Date와%20Time%20API.md)
