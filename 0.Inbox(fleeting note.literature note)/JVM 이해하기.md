@@ -65,15 +65,89 @@ title: tl;dr
 
 
 ## 2. JVM 구조
-### 클래스 로더 시스템
+크게 네 가지 컴포넌트로 구성됨( 클래스 로더 시스템, 메모리, 실행 엔진, JNI와 네이티브 메소드 라이브러리)
+
+### [클래스 로더 시스템](클래스%20로더%20시스템.md)
+- 컴파일된 .class 에서 바이트 코드를 읽고 메모리에 적절히 배치하여 저장
+	![|450](Pasted%20image%2020221019063929.png)
+	- 바이트 코드를 javap 같은 것을 사용해 디컴파일해서 좀 더 사람이 보기 편하도록 보여준다.
+- 클래스 로더가 하는 일
+	- 1. 로딩(loading) : 클래스 파일에서 바이트 코드를 읽어오는 과정
+	- 2. 링크(linking) : 레퍼런스를 연결하는 과정
+	- 3. 초기화(initialization) : static 값들 초기화 및 변수에 할당
+- 클래스에 static 값으로 할당하면 다른 곳에서도 `클래스.XXX`으로 바로 접근해서 사용이 가능하다 
+	```java
+	public class ClassLoaderApp {  
+	  
+	    /**  
+	     * static 값 할당  
+	     */  
+	    static String myName;  
+	  
+	    // static block  
+	    static{  
+	        myName = "grey";  
+	    }  
+	  
+	    public static void main ( String[] args ) {  
+	        System.out.println( ClassLoaderApp.class.getClassLoader() );  
+	        System.out.println( List.class.getClassLoader() );  
+	        System.out.println( myName );  
+	    }  
+	}
+	```
+	이렇게 A 클래스에서 static 값을 할당하고 
+	```java
+	public class ClassLoaderApp2{  
+  
+	    public static void main ( String[] args ) {  
+	        System.out.println( ClassLoaderApp.myName );  
+	    }  
+	  
+	}
+	>> grey
+	```
+	B 클래스에서 바로 쓸 수 있다.
+
 
 ### 메모리
+힙과 메소드 영역만 모든 영역에 공유하는 자원이고 나머지는 실행할 때 쓰레드마다 생기고 그 쓰레드에서만 공유한다.
+
+- **🌟 메소드 영역**: 클래스 수준의 정보를 저장. 공유 자원이다. 
+	- 클래스 수준의 정보 : 클래스 이름, 부모 클래스 이름, 메소드, 변수 
+- **힙 영역**: 객체를 저장. 공유 자원이다. 
+---
+- **스택 영역**: 쓰레드마다 런타임 스택을 만들고, 그 안에 메소드 호출을 `스택 프레임(메서드 콜)`이라 부르는 블럭으로 쌓는다. 쓰레드 종료하면 런타임 스택도 사라진다. 
+	- 에러 메시지를 보면 콜 스택이 쭉- 쌓인게 보인다 
+- **PC (Program Counter) 레지스터**: 쓰레드마다 쓰레드 내 현재 실행할 instruction의 위치를 가리키는 포인터가 생성된다.
+- **네이티브 메소드 스택**
+	- 네이티브 메소드 호출할때 사용하는 별도의 메소드 스택
+	- [https://javapapers.com/core-java/java-jvm-run-time-data-areas/#Program_Counter_PC_Register](https://javapapers.com/core-java/java-jvm-run-time-data-areas/#Program_Counter_PC_Register)
+
+```ad-note
+- 네이티브 메소드: 메소드에 `native` 키워드가 붙어있고, 그 구현을 자바가 아닌 C나 C++로 구현한 것
+- 예를 들어, Thread.currentThread();는 C로 구현되어 있다. 
+- ![](Pasted%20image%2020221019071421.png)
+```
 
 ### 실행 엔진
+- 인터프리터: 바이트 코드를 한 줄씩 실행
+- JIT 컴파일러: 인터프리터의 효율을 높이기 위해, 인터프리터가 `반복되는 코드`를 발견하면 JIT 컴파일러로 `반복되는 바이트 코드를 모두 네이티브 코드로 바꿔둔다.` 그 다음부터 인터프리터는 네이티브 코드로 컴파일된 코드를 바로 사용한다. 
+- GC (Garbage Collector): 더 이상 참조되지 않는 객체들을 모아서 정리한다.
+	- 1. 쓰로우풋 위주의 GC
+	- 2. Stop The World를 줄이는 GC
+		- 많은 객체를 생성하고, response time을 줄이는게 중요하다면 => GC를 할 때 발생하는 멈춤 현상(Stop The World)을 최소화할 수 있는 GC를 사용하는게 좋다.
 
 ### JNI (Java Native Interface)
+- 자바 애플리케이션에서 C, C++, 어셈블리어로 작성된 함수를 사용할 수 있는 방법을 제공
+- native 키워드를 사용한 메소드 호출
+- 우리가 사용하는 코드 중에 native 키워드를 사용하는 메소드가 있다?
+	- 그럼 네이티브 메소드 스택이 생기고 -> JNI를 호출하는 스택프레임이 하나 쌓인다
+- [https://medium.com/@bschlining/a-simple-java-native-interface-jni-example-in-java-and-scala-68fdafe76f5f](https://medium.com/@bschlining/a-simple-java-native-interface-jni-example-in-java-and-scala-68fdafe76f5f)
 
 ### 네이티브 메소드 라이브러리
+- C, C++로 작성된 라이브러리. JNI를 구현한 자체를 네이티브 메소드 라이브러리라 한다
+- 네이티브 라이브러리를 쓰려면 JNI를 통해야 한다. JNI를 사용하는 메소드 스택은 네이티브 메소드 스택에 저장된다. 
 
 
 ## 3. 클래스 로더 
@@ -85,6 +159,10 @@ title: tl;dr
 	-   JIT 컴파일러: [https://aboullaite.me/understanding-jit-compiler-just-in-time-compiler/](https://aboullaite.me/understanding-jit-compiler-just-in-time-compiler/)
 	-   JDK, JRE 그리고 JVM: [https://howtodoinjava.com/java/basics/jdk-jre-jvm/](https://howtodoinjava.com/java/basics/jdk-jre-jvm/)
 	-   [https://en.wikipedia.org/wiki/List_of_JVM_languages](https://en.wikipedia.org/wiki/List_of_JVM_languages)
+	-   [https://www.geeksforgeeks.org/jvm-works-jvm-architecture/](https://www.geeksforgeeks.org/jvm-works-jvm-architecture/)
+	-   [https://dzone.com/articles/jvm-architecture-explained](https://dzone.com/articles/jvm-architecture-explained)
+	-   [http://blog.jamesdbloom.com/JVMInternals.html](http://blog.jamesdbloom.com/JVMInternals.html)
+
 
 
 # 연결문서
