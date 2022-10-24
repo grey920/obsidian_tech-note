@@ -52,6 +52,63 @@ title: tl;dr
 
 
 
+## 애노테이션과 리플렉션
+### 중요 애노테이션
+- `@Retention`: 해당 애노테이션을 언제까지 유지할것인가
+	- 애노테이션은 기본적으로 '주석'과 같다. 따라서 바이트코드를 로딩했을 때 애노테이션 정보는 빼고 읽어오므로, **애노테이션 정보까지 메모리에 올리고 싶다면 @Retention 전략**을 써야 한다. 
+	- 소스( RetentionPolicy.SOURCE ), 클래스( RetentionPolicy.CLASS ), 런타임( RetentionPolicy.RUNTIME )
+	- 기본값은 CLASS
+- `@Inherit`: 해당 애노테이션을 하위 클래스까지 전달할 것인가?
+	- 애노테이션을 사용하는 객체의 자식 객체들도 적용되게 하려면 @Inherited 를 사용한다
+- `@Target`: 어디에 사용할 수 있는가?
+	- 해당 애노테이션을 붙일 위치를 지정한다. 
+	- @Target( {ElementType.TYPE , ElementType.FIELD , ElementType.CONSTRUCTOR })
+
+### 애노테이션에 값 주기
+- 애노테이션은 primitive로 제한된 값들을 가질 수 있다. 
+- 기본값을 주려면 `default` 키워드를 사용한다.
+- value() 는 특별히 애노테이션을 사용할 때 다른 값들처럼 따로 이름을 명시하지 않아도 된다. 
+	- 예. `@MyAnnotation("grey")`
+	- 하지만 여러개의 파라미터를 보낸다면 value도 명시해야 한다. 
+	- 값을 하나만 필요로할 때 유용
+```java
+@Retention( RetentionPolicy.SOURCE )
+@Target( {ElementType.TYPE , ElementType.FIELD , ElementType.CONSTRUCTOR })
+@Inherited 
+public @interface MyAnnotation {  
+	String value() default "grey";  
+  
+	String name() default "grey";  
+  
+	int number() default 100;  
+}
+```
+	
+
+### 리플렉션
+- `getAnnotations()`: 상속받은 (@Inherit) 애노테이션까지 조회
+	```java
+	Arrays.stream( MyBook.class.getAnnotations() ).forEach( System.out::println );
+	```
+
+- `getDeclaredAnnotations()`: 자기 자신에만 붙어있는 애노테이션 조회
+	```java
+	Arrays.stream( MyBook.class.getDeclaredAnnotations() ).forEach( System.out::println );
+	```
+
+- 필드에 붙은 애노테이션 찾기 & 애노테이션 값 조회
+	```java
+	Arrays.stream( Book.class.getDeclaredFields() ).forEach( f -> {  
+	    Arrays.stream( f.getAnnotations() ).forEach( a -> {  
+	        if ( a instanceof MyAnnotation ) {  
+	            MyAnnotation myAnnotation = ( MyAnnotation ) a;  
+	            System.out.println( myAnnotation.value() );  
+	            System.out.println( myAnnotation.name() );  
+	            System.out.println( myAnnotation.number() );  
+	        }  
+	    } );  
+	} );
+	```
 
 
 
