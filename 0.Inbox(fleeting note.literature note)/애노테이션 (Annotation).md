@@ -85,13 +85,13 @@ public @interface MyAnnotation {
 ```
 	
 
-### 리플렉션
+### [리플렉션](리플렉션.md)
 - `getAnnotations()`: 상속받은 (@Inherit) 애노테이션까지 조회
 	```java
 	Arrays.stream( MyBook.class.getAnnotations() ).forEach( System.out::println );
 	```
 
-- `getDeclaredAnnotations()`: 자기 자신에만 붙어있는 애노테이션 조회
+- `getDeclaredAnnotations()`: 자기 자신에만 붙어있는 애노테이션 조회션
 	```java
 	Arrays.stream( MyBook.class.getDeclaredAnnotations() ).forEach( System.out::println );
 	```
