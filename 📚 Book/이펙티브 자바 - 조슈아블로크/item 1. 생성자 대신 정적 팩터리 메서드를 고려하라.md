@@ -66,7 +66,7 @@ public Order ( Product product, boolean urgent ) {
 }
 ```
 
-이럴때 정적 팩터리 메서드를 사용하면 이름으로 표현할 수 있다. 
+이럴때 정적 팩터리 메서드를 사용하면 만드는 객체의 특징을 이름으로 잘 표현할 수 있다. 
 ```java
 public class Order {  
   
@@ -95,14 +95,91 @@ public class Order {
 ```
 
 ### 2) 호출될 때마다 인스턴스를 새로 생성하지는 않아도 된다. 
-- 인스턴스 통제 클래스 : 반복되는 요청에 같은 객체를 반환 =>  `언제 어느 인스턴스를 살아 있게 할지를 철저히 통제`할 수 있다. 
+- `생성자`를  통해 만들면 인스턴스마다 새로운 객체가 만들어진다. 이러한 방법은 인스턴스의 생성 **통제가 불가능**하다.
+	- 만약 Settings 객체가 바뀌면 안되고 *딱 하나만 만들어 사용*해야 한다면?? => **정적 팩토리**를 사용!
+	```java
+	public static void main ( String[] args ) {  
+	    System.out.println( new Settings() );  
+	    System.out.println( new Settings() );  
+	    System.out.println( new Settings() );  
+	}
+	
+	>>>
+	me.whiteship.chapter01.item01.Settings@3796751b
+	me.whiteship.chapter01.item01.Settings@67b64c45
+	me.whiteship.chapter01.item01.Settings@4411d970
+	```
+- `인스턴스 통제 클래스` : 반복되는 요청에 같은 객체를 반환 =>  `언제 어느 인스턴스를 살아 있게 할지를 철저히 통제`할 수 있다. 이 경우, **클라이언트는 인스턴스를 가져올수는 있지만 생성할수는 없다!**
 	- 왜 통제해야 할까?
 	- 인스턴스를 통제하면 1) 클래스를 싱글턴 아이템으로 만들 수도, 2) 인스턴스화 불가 아이템으로 만들수도 있다. 3) 불변  값 클래스에서 동치인 인스턴스가 단 하나뿐임을 보장할 수도 있다. 
 	- 인스턴스 통제는 플라이웨이트 패턴의 근간이 되며, 열거 타입은 인스턴스가 하나만 만들어짐을 보장한다.
 ```ad-question
 title: 인스턴스 통제
-열거 타임은 인스턴스가 하나만 만들어짐을 보장한다고?? 왜지?? 
+열거 타입은 인스턴스가 하나만 만들어짐을 보장한다고?? 왜지?? 
+- enum 클래스는 고정된 상수들의 집합으로, 런타임이 아닌 `컴파일 시점`에 모든 값을 알고 있어야 한다.
+- 즉, 다른 패키지나 클래스에서 enum 타입에 접근해서 동적으로 어떤 값을 정해줄 수 없으며 따라서 타입 안정성이 보장된다. ( 해당 enum 클래스 내에서도 new 키워드, newInstance(), clone() 등의 메소드 사용으로 인스턴스 생성 X )
+- enum 클래스는 **생성자의 접근 제어자를 private으로 설정**해야 하기 때문에 결국 인스턴스 생성을 제어라고 싱글톤을 일반화 한다고 볼 수 있다.
 ```
+
+- 어떻게 만들까
+	- 1. private 생성자 제공 : 외부에서 아무도 변경하지 못하도록 생성자를 private으로 만든다.
+	- 2. 객체를 미리 만들어 놓기 
+	- 3. 정적 팩토리 제공
+- 전제 코드
+	- 정적 팩토리로 생성된 객체들은 모두 같은 해시값을 가지고 있다.
+	```java
+	  
+	/**  
+	 * 이 클래스의 인스턴스는 #getInstance()를 통해 사용한다.  
+	 * @see #getInstance()  
+	 */
+	 public class Settings {  
+	  
+	    private boolean useAutoSteering;  
+	  
+	    private boolean useABS;  
+	  
+	    private Difficulty difficulty;  
+	  
+	    // 1) private 생성자를 만들어 외부에서 변경할 수 없도록 한다.  
+	    private Settings() {}  
+	  
+	    // 2) 미리 만들어놓는다.  
+	    private static final Settings SETTINGS = new Settings();  
+	  
+	    // 3) 정적 팩토리를 제공한다  
+	    public static Settings getInstance() {  
+	        return SETTINGS;  
+	    }  
+	  
+	    public static void main ( String[] args ) {  
+	        System.out.println( new Settings() );  
+	        System.out.println( new Settings() );  
+	        System.out.println( new Settings() );  
+	  
+	        System.out.println(">>>>>>>>>>>>>>>>>>>>");  
+	  
+	        System.out.println( Settings.getInstance() );  
+	        System.out.println( Settings.getInstance() );  
+	        System.out.println( Settings.getInstance() );  
+	    }  
+	  
+	}
+	>> 
+	me.whiteship.chapter01.item01.Settings@3796751b
+	me.whiteship.chapter01.item01.Settings@67b64c45
+	me.whiteship.chapter01.item01.Settings@4411d970
+	>>>>>>>>>>>>>>>>>>>>
+	me.whiteship.chapter01.item01.Settings@6442b0a6
+	me.whiteship.chapter01.item01.Settings@6442b0a6
+	me.whiteship.chapter01.item01.Settings@6442b0a6
+	```
+- 생성하는 로직을 컨트롤하는 것은 정적 팩토리 내에서 가능하다. 
+	- 예를 들어, Boolean의 valueOf()의 경우 매개변수에 따라 미리 만들어놓은 상수를 각각 리턴한다. 
+		![](../../img/Pasted%20image%2020221115071450.png)
+		![](../../img/Pasted%20image%2020221115071529.png)
+	- 즉, 정적 팩토리 메서드를 사용하면 매개변수에 따라 다른 인스턴스를 리턴하는 것이 가능해진다
+
 ### 3) 반환 타입의 하위 타입 객체를 반환할 수 있는 능력이 있다.
 - 반환할 객체의 클래스를 자유롭게 선택할 수 있다. -> 엄청난 유연성!
 - 구현 클래스를 공개하지 않고도 그 객체를 반환할 수 있다 => API를 작게 유지할 수 있다
@@ -149,6 +226,8 @@ title: 정적 팩터리 메서드에 흔히 사용하는 명명 방식들
 
 ## Keyword
 - 플라이웨이트 패턴 (Flyweight pattern) 9p
+	- 우리가 자주 사용하는 답들을 미리 캐싱해서 넣어놓고 꺼내다 쓰는 형식
+	- 미리 자주 사용하는 객체들을 만들어놓고 필요로 하는 인스턴스를 꺼내다 쓰기 때문에 언급됨
 - 인스턴스 통제 클래스(instance-controlled) 9p
 - 서비스 제공자 프레임워크(service provider framework) 11p
 
