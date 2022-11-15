@@ -181,13 +181,26 @@ title: 인스턴스 통제
 	- 즉, 정적 팩토리 메서드를 사용하면 매개변수에 따라 다른 인스턴스를 리턴하는 것이 가능해진다
 
 ### 3) 반환 타입의 하위 타입 객체를 반환할 수 있는 능력이 있다.
-- 반환할 객체의 클래스를 자유롭게 선택할 수 있다. -> 엄청난 유연성!
-- 구현 클래스를 공개하지 않고도 그 객체를 반환할 수 있다 => API를 작게 유지할 수 있다
+- 반환할 객체의 클래스를 자유롭게 선택할 수 있다. -> 엄청난 **유연성**!
+	- 생성자로  만드는 경우, 무조건 본인 타입으로 리턴할 수 밖에 없다.
 	- => API가 작아지면 프로그래머가 API를 사용하기 위해 익혀야 하는 개념의 수와 난이도도 낮아진다.
 - 정적 팩터리 메서드를 사용하는 클라이언트는 얻은 객체를 구현 클래스가 아닌 인터페이스만으로 다루게 된다. ( 좋은 습관 )
+
 ### 4) 입력 매개변수에 따라 매번 다른 클래스의 객체를 반환할 수 있다.
 - 반환 타입의 하위 타입이기만 하면 어떤 클래스의 객체를 반환하든 상관없다. 
 - 클라이언트는 팩터리가 건네주는 객체가 어느 클래스의 인스턴스인지 알 수도 없고 알 필요도 없다. 반환 타입의 하위 클래스이기만 하면 되는 것이다. 
+```java
+public class HelloServiceFactory {  
+	public static HelloService of ( String lang ){  
+		if ( lang.equals( "ko" ) ) {  
+			return new KoreanHelloService();  
+		}  
+		else {  
+			return new EnglishHelloService();  
+		}  
+	}
+}
+```
 ### 5) 정적 팩터리 메서드를 작성하는 시점에는 반환할 객체의 클래스가 존재하지 않아도 된다. 
 - 이런 유연함은 서비스 제공자 프레임워크를 만드는 근간이 된다. 
 - 대표적인 서비스 제공자 프레임워크 : JDBC
@@ -203,6 +216,50 @@ title: 인스턴스 통제
 - +) 3개의 핵심 컴포넌트와 더불어 종종 `서비스 제공자 인터페이스`라는 네 번째 컴포넌트가 쓰이기도 한다. 
 	- 이 컴포넌트는 서비스 인터페이스의 인스턴스를 생성하는 팩터리 객체를 설명해준다. 
 	- JDBC에서 Driver
+
+- **예시**
+- ServiceLoader: 자바가 기본으로 제공하는 정적 팩터리 메서드
+	![](../../img/Pasted%20image%2020221116074236.png)
+```java
+public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {  
+  
+    // ServiceLoader : 자바가 기본으로 제공하는 정적 팩토리 메서드  
+    // ServiceLoader.load( HelloService.class ) : HelloService 타입의 임의의 서비스를 로딩한다.  
+    // 아래 코드가 실행되는 순간, 현재 참조할 수 있는 클래스패쓰 내에 있는 모든 HelloService의 구현체들을 가져온다 (iterable)    
+    ServiceLoader<HelloService> loader = ServiceLoader.load( HelloService.class );  
+  
+    // 구현체 중 가장 첫번째 것을 가져온다. 없을수도 있기 때문에 Optional을 사용함  
+    Optional<HelloService> helloServiceOptional = loader.findFirst();  
+    // 있으면 호출해라  
+    helloServiceOptional.ifPresent( helloService -> {  
+        System.out.println( helloService.hello() );  
+    } );
+}
+
+>>> Ni Hao
+```
+
+helloServiceOptional에 존재하지 않는 ChineHelloService 클래스가 들어있다.
+현재 **정적 팩토리가 있는 상태에서 구현체가 없는 상황**인 것이다. `인터페이스`만 있으면 되는 것이다.
+![](../../img/Pasted%20image%2020221116075055.png)
+
+- 존재하지 않는 ChineHelloService 클래스는 어디에서 어떻게 왔을까?
+서비스 제공자 프레임워크의 자바 기본 구현체인 `ServiceLoader`를 사용한 것.
+1) ChineHelloService는 다른 프로젝트에 구현해 놓았다.
+![](../../img/Pasted%20image%2020221116080052.png)
+
+2) 그리고 이 ChineHelloService를 등록해 놓았다. ( resources/META-INF/services/FQFN클래스명)
+	- 파일 안에 `풀 패키지 경로 + 클래스명` 까지 써주면 jar 로 패키징할 때 이 정보가 jar 안에 들어가고, 그럼 다른 프로젝트에서 참조해서 사용할 수 있게된다.
+![](../../img/Pasted%20image%2020221116075954.png)
+
+3) 다시 ServiceLoader로 사용하는 쪽 pom.xml에 ChineHelloService를 패키징한 jar를 넣어 참조한다.
+![](../../img/Pasted%20image%2020221116080733.png)
+
+- **어차피 디펜던시로 ChineHelloService를 참조한다면 new 생성자로 바로 쓰면되지, 왜 저런식으로 사용하는가??**
+```java
+ChineseHelloService helloService = new ChineseHelloService();  
+System.out.println( helloService.hello() );
+```
 
 ## 정적 팩터리 메서드의 단점
 ### 1) 상속을 하려면 public이나 protected 생성자가 필요하니 정적 팩터리 메서드만 제공하면 하위 클래스를 만들 수 없다. 
