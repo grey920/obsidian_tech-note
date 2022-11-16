@@ -273,21 +273,47 @@ helloServiceOptional에 존재하지 않는 ChineHelloService 클래스가 들�
 ### 1) 상속을 하려면 public이나 protected 생성자가 필요하니 정적 팩터리 메서드만 제공하면 하위 클래스를 만들 수 없다. 
 - 예를 들어 컬렉션 프레임워크의 유틸리티 구현 클래스들은 상속할 수 없다. 
 - [상속보다 컴포지션을 사용](item%2018.%20상속보다는%20컴포지션을%20사용하라.md)하도록 유도하고 [불변 타입](item%2017.%20변경%20가능성을%20최소화하라.md)으로 만들려면 오히려 장점으로 받아들여질수도 있다.
+- 예를 들어 정적 팩터리 메서드를 사용하는 Settings 라는 클래스를 상속해서 AdvancedSettings 클래스를 만들고 싶어도 Settings 클래스의 생성자는 private이라 상속을 할 수 없다.
+- 대신 우회하는 방법으로 AdvancedSettings에 Settings를 delegation으로 가지고 있고, 이 안에서 settings를 변경하게 하면 굳이 상속을 안해도 그 기능을 사용할 수 있다. 
+	```java
+	public class AdvancedSettings {  
+  
+	    Settings settings;  
+  
+	}
+	```
 
-### 2) 정적 팩터리 메서드는 프로그래머가 찾기 어렵다. 
+
+```ad-note
+- static 팩터리 메서드를 제공하면서도 public한 생성자를 제공할 수도 있다!
+- 그 예로 List는 new로도 만들 수 있지만, List.of()를 사용해서도 만들 수 있다.
+```
+
+### 2) 정적 팩터리 메서드는 프로그래머가 찾기 어렵다. (문서화 관련)
 - 생성자처럼 API 설명에 명확히 드러나지 않으니 사용자는 정적 팩터리 메서드 방식 클래스를 인스턴스화할 방법을 `알아내야` 한다.
-- API 문서를 잘 써놓고 메서드 이름도 널리 알려진 규약에 따라 짓는 식으로 문제를 완화해줘야 한다. 
+- **API 문서를 잘 써놓고** 메서드 이름도 널리 알려진 규약에 따라 짓는 식으로 문제를 완화해줘야 한다. ( **네이밍 패턴** )
 ```ad-attention
 title: 정적 팩터리 메서드에 흔히 사용하는 명명 방식들
 - from 
 - of
+	- 매개변수를 받아서 생성하는 경우
 - valueOf
 - instance 혹은 getInstance
+	-  미리 만들어져있는 인스턴스를 가져오는 경우
 - create 혹은 newInstance
+	- 매번 팩토리 안에서 새로 만드는 경우
 - getType
 - newType
 - type
 ```
+
+```ad-info
+title: 문서화(주석)관련
+- @see 
+- `#` : 자신이 가지고 있는 메서드를 참조할 때는 `#getInstance()` 이런 식으로 참조.
+	- 밖에 있는 클래스를 참조하려면 `Settings#getInstance()` 이런 식으로 작성
+```
+
 
 ## Keyword
 - 플라이웨이트 패턴 (Flyweight pattern) 9p
