@@ -218,7 +218,7 @@ public class HelloServiceFactory {
 	- JDBC에서 Driver
 
 - **예시**
-- ServiceLoader: 자바가 기본으로 제공하는 정적 팩터리 메서드
+- [서비스 로더 (Service Loader)](../../0.Inbox(fleeting%20note.literature%20note)/서비스%20로더%20(Service%20Loader).md): 자바가 기본으로 제공하는 정적 팩터리 메서드
 	![](../../img/Pasted%20image%2020221116074236.png)
 ```java
 public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {  
@@ -256,10 +256,18 @@ helloServiceOptional에 존재하지 않는 ChineHelloService 클래스가 들�
 ![](../../img/Pasted%20image%2020221116080733.png)
 
 - **어차피 디펜던시로 ChineHelloService를 참조한다면 new 생성자로 바로 쓰면되지, 왜 저런식으로 사용하는가??**
-```java
-ChineseHelloService helloService = new ChineseHelloService();  
-System.out.println( helloService.hello() );
-```
+	```java
+	ChineseHelloService helloService = new ChineseHelloService();  
+	System.out.println( helloService.hello() );
+	```
+	- 이 코드를 써도 된다. 하지만 이 코드는 `ChineseHelloService`에 **의존적**이다.
+		- 이렇게 쓰면 ChineseHelloService를 import 해야한다. 이는 ChineseHelloService를 사용하겠다고 명확하게 표현한 것. (의존성 생김)
+	- 앞에서 **ServiceLoader**를 사용한 코드는 `ChineseHelloService`에 **의존적이지 않다**.
+		- `어떤 ServiceLoader는 어떤 구현체가 올지 코드상에서 알 수가 없다.`
+		- -> 어떤 구현체가 올 지 모르지만 이 구현체가 따르는 인터페이스 기반으로만 코딩하면 되는 경우 이런 식으로 쓴다. 
+		- 예) JDBC 드라이버. 어떤  DB를 사용할 지 코드는 모르는 상황.
+
+
 
 ## 정적 팩터리 메서드의 단점
 ### 1) 상속을 하려면 public이나 protected 생성자가 필요하니 정적 팩터리 메서드만 제공하면 하위 클래스를 만들 수 없다. 
@@ -287,7 +295,8 @@ title: 정적 팩터리 메서드에 흔히 사용하는 명명 방식들
 	- 미리 자주 사용하는 객체들을 만들어놓고 필요로 하는 인스턴스를 꺼내다 쓰기 때문에 언급됨
 - 인스턴스 통제 클래스(instance-controlled) 9p
 - 서비스 제공자 프레임워크(service provider framework) 11p
-
+- [서비스 로더 (Service Loader)](../../0.Inbox(fleeting%20note.literature%20note)/서비스%20로더%20(Service%20Loader).md)
+- 
 
 # 출처(참고문헌)
 - 
