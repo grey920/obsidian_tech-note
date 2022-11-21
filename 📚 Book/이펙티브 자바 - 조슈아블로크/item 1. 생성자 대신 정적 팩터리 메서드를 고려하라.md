@@ -314,15 +314,24 @@ title: 문서화(주석)관련
 	- 밖에 있는 클래스를 참조하려면 `Settings#getInstance()` 이런 식으로 작성
 ```
 
+- javadoc 만들기
+	- `mvn javadoc:javadoc`
+	- target/site/apidocs 하위에 index.html이 생성된다.
+	- 이를 브라우저로 열어보면 @see 주석으로 작성한 내용이 description으로 출력된다
+![](../../img/Pasted%20image%2020221122064608.png)
+
+
 
 ## Keyword
+- [열거 타입](../../0.Inbox(fleeting%20note.literature%20note)/열거%20타입.md) 9p
 - 플라이웨이트 패턴 (Flyweight pattern) 9p
 	- 우리가 자주 사용하는 답들을 미리 캐싱해서 넣어놓고 꺼내다 쓰는 형식
 	- 미리 자주 사용하는 객체들을 만들어놓고 필요로 하는 인스턴스를 꺼내다 쓰기 때문에 언급됨
 - 인스턴스 통제 클래스(instance-controlled) 9p
 - 서비스 제공자 프레임워크(service provider framework) 11p
 - [서비스 로더 (Service Loader)](../../0.Inbox(fleeting%20note.literature%20note)/서비스%20로더%20(Service%20Loader).md)
-- 
+- 자바 8부터는 인터페이스가 정적 메서드를 가질 수 없다는 제한이 풀렸기 때문에 인스턴스화 불가 동반 클래스를 둘 이유가 별로 없다.
+	- **인터페이스가 정적 메서드를 가질 수 있게 되었다**. 10p
 
 # 출처(참고문헌)
 - 
