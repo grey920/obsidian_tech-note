@@ -324,9 +324,10 @@ title: 문서화(주석)관련
 
 ## Keyword
 - [열거 타입](../../0.Inbox(fleeting%20note.literature%20note)/열거%20타입.md) 9p
-- 플라이웨이트 패턴 (Flyweight pattern) 9p
+- [플라이웨이트 패턴 (Flyweight pattern)](../../0.Inbox(fleeting%20note.literature%20note)/플라이웨이트%20패턴%20(Flyweight%20pattern).md) 9p
 	- 우리가 자주 사용하는 답들을 미리 캐싱해서 넣어놓고 꺼내다 쓰는 형식
 	- 미리 자주 사용하는 객체들을 만들어놓고 필요로 하는 인스턴스를 꺼내다 쓰기 때문에 언급됨
+	- 같은 객체가 자주 사용되는 경우,,, -> 어딘가에 저장해놓거나 캐싱하면 좋지 않을까? 재사용을 해야지 => 플라이웨이트 패턴은 `재사용`하는 기법 중 하나
 - 인스턴스 통제 클래스(instance-controlled) 9p
 - 서비스 제공자 프레임워크(service provider framework) 11p
 - [서비스 로더 (Service Loader)](../../0.Inbox(fleeting%20note.literature%20note)/서비스%20로더%20(Service%20Loader).md)
